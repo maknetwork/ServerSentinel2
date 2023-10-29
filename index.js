@@ -17,6 +17,7 @@ let offlineInterval = null;
 
 app.use(cors());
 app.get("/", (req, res) => {
+  const emoji = notificationSent ? "🔴" : "🟢";
   res.send(`
       <html>
         <head>
@@ -28,13 +29,24 @@ app.get("/", (req, res) => {
               align-items: center;
               height: 100vh;
               margin: 0;
-            }
-            h1 {
               font-size: 3em;
+            }
+            .status {
+              font-size: 2em;
+              margin-right: 10px;
+            }
+            .status.online {
+              color: green;
+            }
+            .status.offline {
+              color: red;
             }
           </style>
         </head>
         <body>
+          <div class="status ${
+            notificationSent ? "offline" : "online"
+          }">${emoji}</div>
           <h1>Server Sentinel</h1>
         </body>
       </html>
@@ -44,7 +56,7 @@ function checkServerStatus() {
   const currentTime = new Date();
   const timeDifference = currentTime - lastCall;
 
-  if (timeDifference > 10 * 1000 && !notificationSent) {
+  if (timeDifference > 15 * 60 * 1000 && !notificationSent) {
     const formattedDate = moment(lastCall).format("MMMM Do YYYY, h:mm:ss a"); // Format date using Moment.js
 
     const text = `Server went offline at: ${formattedDate}`;
@@ -62,7 +74,7 @@ function checkServerStatus() {
         const text = `Server has been offline for more than an hour since: ${formattedDate}`;
         sendNotification(text);
       }
-    }, 60 * 60 * 1000); // Repeat every hour
+    }, 61 * 60 * 1000); // Repeat every hour
   }
 }
 
@@ -81,7 +93,7 @@ async function sendNotification(text) {
   }
 }
 
-setInterval(checkServerStatus, 11 * 1000); // Check server status every 1 second
+setInterval(checkServerStatus, 16 * 60 * 1000); // Check server status every 1 second
 
 app.get("/updateLastCall", (req, res) => {
   const token = req.headers.authorization;
