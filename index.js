@@ -96,6 +96,7 @@ setInterval(checkServerStatus, 16 * 60 * 1000); // Check server status every 1 s
 
 app.get("/updateLastCall", (req, res) => {
   const token = req.headers.authorization;
+  console.log("Call Detected");
 
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
