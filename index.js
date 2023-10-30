@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const moment = require("moment"); // Added this line
-const fetch = require("node-fetch");
 require("dotenv").config();
 
 const app = express();
@@ -18,40 +17,40 @@ let offlineInterval = null;
 app.use(cors());
 app.get("/", (req, res) => {
   const emoji = notificationSent ? "🔴" : "🟢";
+  const lastSeen = moment(lastCall).fromNow(); // Calculate last seen time using Moment.js
+  const icon = notificationSent
+    ? '<i class="fas fa-exclamation-circle text-red-500"></i>'
+    : '<i class="fas fa-check-circle text-green-500"></i>';
+
   res.send(`
-      <html>
-        <head>
-          <title>Server Sentinel</title>
-          <style>
-            body {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 100vh;
-              margin: 0;
-              font-size: 3em;
-            }
-            .status {
-              font-size: 2em;
-              margin-right: 10px;
-            }
-            .status.online {
-              color: green;
-            }
-            .status.offline {
-              color: red;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="status ${
-            notificationSent ? "offline" : "online"
-          }">${emoji}</div>
-          <h1>Server Sentinel</h1>
-        </body>
-      </html>
+  <html>
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Sentinel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Orbitron', sans-serif;      }
+
+        </style>
+
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+  </head>
+  <body class="flex flex-col justify-center items-center h-screen bg-gray-100">
+    <div class="text-6xl">${icon}</div>
+    <h1 class="text-4xl mb-4">Server Sentinel</h1>
+    <p class="text-xl mb-8">Last Seen: ${lastSeen}</p>
+  </body>
+</html>
     `);
 });
+
 function checkServerStatus() {
   const currentTime = new Date();
   const timeDifference = currentTime - lastCall;
